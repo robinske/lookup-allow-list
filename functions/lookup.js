@@ -1,26 +1,6 @@
-/**
- *  Lookup - validate a phone number
- *
- *  This function will tell you whether or not a phone number is valid using Twilio's Lookup API
- *
- *  Parameters:
- *  "phone" - string - phone number in E.164 format (https://www.twilio.com/docs/glossary/what-e164)
- *
- *  Returns JSON
- *  {
- *    "success": boolean,
- *    "error": string      // not present if success is true
- *  }
- */
-
 exports.handler = function (context, event, callback) {
   const response = new Twilio.Response();
   response.appendHeader("Content-Type", "application/json");
-
-  // uncomment to support CORS
-  // response.appendHeader('Access-Control-Allow-Origin', '*');
-  // response.appendHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  // response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (event.phone === "" || typeof event.phone === "undefined") {
     response.setBody({
@@ -33,15 +13,27 @@ exports.handler = function (context, event, callback) {
 
   const client = context.getTwilioClient();
 
+  const allow = ["US", "CA", "MX"];
+
   client.lookups
     .phoneNumbers(event.phone)
     .fetch()
     .then((resp) => {
-      response.setStatusCode(200);
-      response.setBody({
-        success: true,
-      });
-      callback(null, response);
+      console.log(resp);
+      if (allow.includes(resp.countryCode)) {
+        response.setStatusCode(200);
+        response.setBody({
+          success: true,
+        });
+        return callback(null, response);
+      } else {
+        response.setStatusCode(401);
+        response.setBody({
+          success: false,
+          error: "Country code not allowed",
+        });
+        return callback(null, response);
+      }
     })
     .catch((error) => {
       console.log(error);
@@ -50,6 +42,6 @@ exports.handler = function (context, event, callback) {
         success: false,
         error: error.message,
       });
-      callback(null, response);
+      return callback(null, response);
     });
 };

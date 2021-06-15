@@ -51,10 +51,6 @@
         info.style.display = "none";
         error.style.display = "none";
 
-        // OPTION 1 - Twilio Lookup API
-        // Pros: Free API call, updated data
-        // Pros: The Lookup API can return line type and carrier info too: https://www.twilio.com/docs/lookup/api
-        // Cons: Network request
         const data = new URLSearchParams();
         data.append("phone", phoneNumber);
 
@@ -70,24 +66,13 @@
           } else {
             console.log(json.error);
             error.style.display = "";
-            error.innerHTML = `Invalid phone number.`
+            error.innerHTML = json.error;
           }
         })
         .catch(err => {
           error.style.display = "";
           error.innerHTML = `Something went wrong: ${err}`
         });
-
-        // OPTION 2 - intl-tel-input validity check
-        // Pros: No additional API call
-        // Cons: Requires plugin updates for updates on phone number validity
-        // if (phoneInput.isValidNumber()) {
-        //   info.style.display = "";
-        //   info.innerHTML = `Phone number in E.164 format: <strong>${phoneNumber}</strong>`
-        // } else {
-        //   error.style.display = "";
-        //   error.innerHTML = `Invalid phone number.`
-        // }
       }
 
       const form = document.getElementById("lookup");
