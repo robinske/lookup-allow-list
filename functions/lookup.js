@@ -15,7 +15,7 @@ exports.handler = function (context, event, callback) {
 
   const allow = ["US", "CA", "MX"];
 
-  client.lookups
+  client.lookups.v2
     .phoneNumbers(event.phone)
     .fetch()
     .then((resp) => {
